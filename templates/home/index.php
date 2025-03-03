@@ -13,7 +13,11 @@
                 <option>Pub</option>
                 <option>Glaces</option>
             </select>
-            <button class="search-btn">🔎︎</button>
+            <div>
+                <button class="search-btn">
+                    <span class="material-symbols-rounded">search</span>
+                </button>
+            </div>
         </div>
     </div>
     <img src="/assets/images/plat.png" alt="Brochettes et salade" class="header__img-right">
