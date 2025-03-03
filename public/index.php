@@ -10,7 +10,7 @@ $request = $_SERVER['REQUEST_URI'];
 $path = parse_url($request, PHP_URL_PATH);
 $path = trim($path, '/');
 
-
+$db = new \App\Config\Database();
 $controller = new \App\Controllers\HomeController();
 
 if (empty($path)) {

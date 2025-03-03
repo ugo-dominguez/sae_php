@@ -5,21 +5,22 @@ class Database {
     private static $instance = null;
     private \PDO $connection;
     
-    private function __construct() {
+    public function __construct() {
         $config = [
             'server' => 'servinfo-maria',
-            'dbname' => 'DBdominguez',
-            'username' => 'dominguez',
-            'password' => 'dominguez',
+            'dbname' => 'DBthomas',
+            'username' => 'thomas',
+            'password' => 'thomas',
         ];
 
         try {
-            $dsn = "mysql:server={$config['server']};dbname={$config['dbname']}}";
+            $dsn = "mysql:host={$config['server']};dbname={$config['dbname']}";
             $this->connection = new \PDO($dsn, $config['username'], $config['password'], [
                 \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
                 \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
                 \PDO::ATTR_EMULATE_PREPARES => false
             ]);
+            $dsn = "mysql:server={$config['server']};dbname={$config['dbname']}}";
         } catch (\PDOException $e) {
             throw new \Exception("Échec de connexion à la BD : " . $e->getMessage());
         }
