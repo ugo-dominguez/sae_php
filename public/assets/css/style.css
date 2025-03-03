@@ -23,7 +23,10 @@ body {
 
 .logo { 
     font-size: 1.8rem;
-    font-weight: bold; 
+    font-weight: bold;
+    aspect-ratio: auto; 
+    width: 120px;
+    height: 30  px;
 }
 
 .auth-buttons .login {
@@ -176,3 +179,4 @@ body {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     cursor: pointer;
 }
+
