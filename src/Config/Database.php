@@ -36,4 +36,17 @@ class Database {
     public function getConnection(): \PDO {
         return $this->connection;
     }
+
+    public function getRestaurants() {
+        try {
+            $stmt = $this->connection->prepare("
+                SELECT * from RESTAURANT
+            ");
+            printf($stmt);
+            $stmt->execute();
+            return $stmt->fetchAll();
+        } catch (\PDOException $e) {
+            throw new \Exception("Erreur lors du chargement des restaurants: " . $e->getMessage());
+        }
+    }
 }
