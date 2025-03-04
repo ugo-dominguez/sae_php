@@ -37,16 +37,35 @@ class Database {
         return $this->connection;
     }
 
-    public function getRestaurants() {
+    public function restaurantsLoaded() {
         try {
-            $stmt = $this->connection->prepare("
-                SELECT * from RESTAURANT
-            ");
-            printf($stmt);
-            $stmt->execute();
-            return $stmt->fetchAll();
+            $stmt = $this->connection->query("SELECT COUNT(*) FROM Restaurant");
+            $count = (int) $stmt->fetchColumn();
+            return ($count > 0);
         } catch (\PDOException $e) {
-            throw new \Exception("Erreur lors du chargement des restaurants: " . $e->getMessage());
+            throw new \Exception("Erreur lors d'une requête sur Restaurant: " . $e->getMessage());
+        }
+    }
+
+    public function insertRestaurants(array $data) {
+        try {
+            foreach ($data as $restaurant) {
+                $sql = "INSERT INTO Restaurant (address, nameR, schedule, website, phone, accessibl, delivery)
+                        VALUES (:address, :nameR, :schedule, :website, :phone, :accessible, :delivery)";
+                
+                $stmt = $this->connection->prepare($sql);
+                $stmt->execute([
+                    ':address' => $restaurant['commune'] ?? null,
+                    ':nameR' => $restaurant['name'] ?? null,
+                    ':schedule' => $restaurant['opening_hours'] ?? null,
+                    ':website' => $restaurant['website'] ?? null,
+                    ':phone' => $restaurant['phone'] ?? null,
+                    ':accessible' => ($restaurant['wheelchair'] === 'yes') ? 1 : 0,
+                    ':delivery' => ($restaurant['delivery'] === 'yes') ? 1 : 0,
+                ]);
+            }
+        } catch (\PDOException $e) {
+            throw new \Exception("Erreur lors de l'insertion du restaurant: " . $e->getMessage());
         }
     }
 
