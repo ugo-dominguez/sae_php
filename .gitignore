@@ -1,4 +1,5 @@
 *.pdf
+*.db
 ##### Windows
 # Windows thumbnail cache files
 Thumbs.db
