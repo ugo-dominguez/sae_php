@@ -6,45 +6,112 @@ use PDOException;
 
 class Database {
     public static string $dbPath = ROOT_DIR . '/baratie.db';
-    public static PDO $connection;
+    public static ?PDO $connection = null;
+    public static $data = null;
     
-    public static function setConnection() {
-        try {
-            self::$connection = new PDO("sqlite:" . self::$dbPath);
-            self::$connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        } catch (PDOException $e) {
-            throw new \Exception("Échec de connexion à la BD : " . $e->getMessage());
+    public static function getConnection(): PDO {
+        if (self::$connection === null) {
+            try {
+                self::$connection = new PDO("sqlite:" . self::$dbPath);
+                self::$connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                self::initDatabase();
+            } catch (PDOException $e) {
+                throw new \Exception("Échec de connexion à la BD : " . $e->getMessage());
+            }
+        }
+        return self::$connection;
+    }
+
+    public static function initDatabase(): void {
+        if (!self::isDatabaseInitialized()) {
+            $jsonFilePath = ROOT_DIR . "/public/assets/restaurants_orleans.json";
+            $provider = new Provider($jsonFilePath);
+            self::$data = $provider->getData();
+            self::createTables();
+            self::insertInitData();
+        } else {
+            self::createTables();
         }
     }
 
-    public static function insertRestaurants(array $data) {
+    public static function isDatabaseInitialized(): bool {
         try {
-            $restaurantsToInsert = array_map(function($restaurant) {
-                return [
-                    'address' => $restaurant['commune'] ?? null,
-                    'nameR' => $restaurant['name'] ?? null,
-                    'schedule' => $restaurant['opening_hours'] ?? null,
-                    'website' => $restaurant['website'] ?? null,
-                    'phone' => $restaurant['phone'] ?? null,
-                    'accessibl' => ($restaurant['wheelchair'] === 'yes') ? 1 : 0,
-                    'delivery' => ($restaurant['delivery'] === 'yes') ? 1 : 0
-                ];
-            }, $data);
+            $stmt = self::$connection->query("SELECT COUNT(*) FROM Restaurant");
+            return (int)$stmt->fetchColumn() > 0;
 
-            Database::insertInto('Restaurant', $restaurantsToInsert);
         } catch (PDOException $e) {
-            throw new \Exception("Erreur lors de l'insertion des restaurants: " . $e->getMessage());
+            return false;
         }
+    }
+
+    public static function insertInitData() {
+        try {
+            $foodTypes = self::prepareFoodTypeData();
+            self::insertInto('FoodType', $foodTypes);
+    
+            $restaurants = self::prepareRestaurantData();
+            self::insertInto('Restaurant', $restaurants);
+    
+            $servesData = self::prepareServesData();
+            self::insertInto('Serves', $servesData);
+
+        } catch (PDOException $e) {
+            self::$connection->rollBack();
+            throw new \Exception("Erreur lors de l'insertion des données initiales: " . $e->getMessage());
+        }
+    }
+
+    private static function prepareFoodTypeData(): array {
+        $foodTypes = [];
+        foreach (self::$data as $restaurant) {
+            $cuisines = is_array($restaurant['cuisine']) ? $restaurant['cuisine'] : [$restaurant['cuisine']];
+            $foodTypes = array_merge($foodTypes, $cuisines);
+        }
+        return array_map(fn($cuisine) => ['type' => $cuisine], array_unique($foodTypes));
+    }
+
+    private static function prepareRestaurantData(): array {
+        return array_map(fn($restaurant) => [
+            'nameR' => $restaurant['name'] ?? null, 
+            'city' => $restaurant['commune'] ?? null,
+            'schedule' => $restaurant['opening_hours'] ?? null,
+            'website' => $restaurant['website'] ?? null,
+            'phone' => $restaurant['phone'] ?? null,
+            'latitude' => $restaurant['geo_point_2d']['lat'] ?? null,
+            'longitude' => $restaurant['geo_point_2d']['lon'] ?? null,
+            'accessibl' => ($restaurant['wheelchair'] === 'yes') ? 1 : 0,
+            'delivery' => ($restaurant['delivery'] === 'yes') ? 1 : 0,
+        ], self::$data);
+    }
+
+    private static function prepareServesData(): array {
+        $servesData = [];
+        foreach (self::$data as $index => $restaurant) {
+            $idRestau = $index + 1;
+            $cuisines = is_array($restaurant['cuisine']) ? $restaurant['cuisine'] : [$restaurant['cuisine']];
+            
+            foreach ($cuisines as $cuisine) {
+                $servesData[] = [
+                    'idRestau' => $idRestau,
+                    'type' => $cuisine
+                ];
+            }
+        }
+        return $servesData;
     }
 
     public static function insertInto(string $tableName, array $dataSet) {
         try {
+            if (empty($dataSet)) {
+                return;
+            }
+
             $columns = implode(', ', array_keys($dataSet[0]));
             $placeholders = implode(', ', array_fill(0, count($dataSet[0]), '?'));
             $sql = "INSERT INTO {$tableName} ({$columns}) VALUES ({$placeholders})";
-            $stmt = self::$connection->prepare($sql);
 
             self::$connection->beginTransaction();
+            $stmt = self::$connection->prepare($sql);
             foreach ($dataSet as $data) {
                 $stmt->execute(array_values($data));
             }
@@ -72,11 +139,13 @@ class Database {
     
             self::$connection->exec("CREATE TABLE IF NOT EXISTS Restaurant (
                 idRestau INTEGER PRIMARY KEY AUTOINCREMENT,
-                address TEXT,
+                city TEXT,
                 nameR TEXT NOT NULL,
                 schedule TEXT,
                 website TEXT,
                 phone TEXT,
+                latitude REAL,
+                longitude REAL,
                 accessibl INTEGER NOT NULL DEFAULT 0, 
                 delivery INTEGER NOT NULL DEFAULT 0
             )");

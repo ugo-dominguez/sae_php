@@ -1,3 +1,12 @@
+<?php
+
+use App\Config\Requests;
+
+Requests::getConnection();
+$restaurants = Requests::getRestaurants(5);
+
+?>
+
 <div class="header__main">
     <img src="/assets/images/burger.png" alt="Burger et frites" class="header__img-left">
     <div class="search-container">
@@ -26,50 +35,26 @@
 <main class="restaurants">
     <h2 class="hline">Restaurants à la une</h2>
     <div class="restaurant-list">
+    <?php foreach ($restaurants as $restaurant): ?>
         <div class="restaurant-card">
-            <img src="/assets/images/baratie.jpg" alt="Freshkin">
-            <h3>Freshkin</h3>
-            <p>7 Av. du Général Patton, 45000 Orléans</p>
-            <p>★★★★☆ (85 avis)</p>
-            <p>Ouvert • Ferme à 19:00</p>
-            <span class="badge">Végétarien</span>
-            <span class="badge red">Accessible</span>
+            <img src="/assets/images/baratie.jpg" alt="<?= htmlspecialchars($restaurant->name) ?>">
+            <h3><?= htmlspecialchars($restaurant->name) ?></h3>
+            <p><?= htmlspecialchars($restaurant->getAddress()) ?></p>
+
+            <?php if ($restaurant->isCurrentlyOpen()): ?>
+                <p><span style="color: green;">Ouvert</span> • Ferme à</p>
+            <?php else: ?>
+                <p><span style="color: red;">Fermé</span> • Ouvre à</p>
+            <?php endif; ?>
+
+            <?php if ($restaurant->accessible): ?>
+                <span class="badge green">Accessible</span>
+            <?php endif; ?>
+            
+            <?php if ($restaurant->delivery): ?>
+                <span class="badge">Livraison</span>
+            <?php endif; ?>
         </div>
-        <div class="restaurant-card">
-            <img src="/assets/images/baratie.jpg" alt="Freshkin">
-            <h3>Freshkin</h3>
-            <p>7 Av. du Général Patton, 45000 Orléans</p>
-            <p>★★★★☆ (85 avis)</p>
-            <p>Ouvert • Ferme à 19:00</p>
-            <span class="badge">Végétarien</span>
-            <span class="badge red">Accessible</span>
-        </div>
-        <div class="restaurant-card">
-            <img src="/assets/images/baratie.jpg" alt="Freshkin">
-            <h3>Freshkin</h3>
-            <p>7 Av. du Général Patton, 45000 Orléans</p>
-            <p>★★★★☆ (85 avis)</p>
-            <p>Ouvert • Ferme à 19:00</p>
-            <span class="badge">Végétarien</span>
-            <span class="badge red">Accessible</span>
-        </div>
-        <div class="restaurant-card">
-            <img src="/assets/images/baratie.jpg" alt="Freshkin">
-            <h3>Freshkin</h3>
-            <p>7 Av. du Général Patton, 45000 Orléans</p>
-            <p>★★★★☆ (85 avis)</p>
-            <p>Ouvert • Ferme à 19:00</p>
-            <span class="badge">Végétarien</span>
-            <span class="badge red">Accessible</span>
-        </div>
-        <div class="restaurant-card">
-            <img src="/assets/images/baratie.jpg" alt="Freshkin">
-            <h3>Freshkin</h3>
-            <p>7 Av. du Général Patton, 45000 Orléans</p>
-            <p>★★★★☆ (85 avis)</p>
-            <p>Ouvert • Ferme à 19:00</p>
-            <span class="badge">Végétarien</span>
-            <span class="badge red">Accessible</span>
-        </div>
-    </div>
+    <?php endforeach; ?>
+</div>
 </main>

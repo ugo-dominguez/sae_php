@@ -25,20 +25,6 @@ try {
     // Urls
     $router->get('', [$controller, 'home']);
     $router->dispatch($path);
-    
-    // Provider
-    $jsonFilePath = __DIR__ . "/assets/restaurants_orleans.json";
-    $provider = new Provider($jsonFilePath);
-    $data = $provider->getData();
-
-    // Database
-    $dbPath = ROOT_DIR . '/baratie.db';
-    if (!file_exists($dbPath)) {
-        Database::createTables();
-        Database::insertRestaurants($data);
-    }
-    Database::setConnection();
-    Requests::setConnection();
 
 } catch (\Exception $e) {
     http_response_code($e->getCode() ?: 500);
