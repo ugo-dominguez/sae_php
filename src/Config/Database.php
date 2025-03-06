@@ -6,7 +6,7 @@ use PDOException;
 
 class Database {
     public static string $dbPath = ROOT_DIR . 'baratie.db';
-    public static PDO $connection = Database::setConnection();
+    public static PDO $connection;
     
     public static function setConnection() {
         try {

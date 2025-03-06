@@ -7,6 +7,7 @@ require_once ROOT_DIR . '/vendor/autoload.php';
 use App\Config\Provider;
 use App\Config\Database;
 use App\Config\Router;
+use App\Config\Requests;
 use App\Controllers\HomeController;
 
 session_start();
@@ -36,6 +37,8 @@ try {
         Database::createTables();
         Database::insertRestaurants($data);
     }
+    Database::setConnection();
+    Requests::setConnexion();
 
 } catch (\Exception $e) {
     http_response_code($e->getCode() ?: 500);
