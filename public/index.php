@@ -33,9 +33,8 @@ try {
     // Database
     $dbPath = ROOT_DIR . '/baratie.db';
     if (!file_exists($dbPath)) {
-        $db = new Database($dbPath);
-        $db->createTables();
-        $db->insertRestaurants($data);
+        Database::createTables();
+        Database::insertRestaurants($data);
     }
 
 } catch (\Exception $e) {
