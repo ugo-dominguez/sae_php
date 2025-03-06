@@ -5,22 +5,19 @@ use PDO;
 use PDOException;
 
 class Database {
-    private PDO $connection;
+    public static string $dbPath = ROOT_DIR . 'baratie.db';
+    public static PDO $connection = Database::setConnection();
     
-    public function __construct(string $dbPath='database.db') {
+    public static function setConnection() {
         try {
-            $this->connection = new PDO("sqlite:" . $dbPath);
-            $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            self::$connection = new PDO("sqlite:" . self::$dbPath);
+            self::$connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (PDOException $e) {
             throw new \Exception("Échec de connexion à la BD : " . $e->getMessage());
         }
     }
-    
-    public function getConnection(): PDO {
-        return $this->connection;
-    }
 
-    public function insertRestaurants(array $data) {
+    public static function insertRestaurants(array $data) {
         try {
             $restaurantsToInsert = array_map(function($restaurant) {
                 return [
@@ -34,46 +31,46 @@ class Database {
                 ];
             }, $data);
 
-            $this->insertInto('Restaurant', $restaurantsToInsert);
+            Database::insertInto('Restaurant', $restaurantsToInsert);
         } catch (PDOException $e) {
             throw new \Exception("Erreur lors de l'insertion des restaurants: " . $e->getMessage());
         }
     }
 
-    public function insertInto(string $tableName, array $dataSet) {
+    public static function insertInto(string $tableName, array $dataSet) {
         try {
             $columns = implode(', ', array_keys($dataSet[0]));
             $placeholders = implode(', ', array_fill(0, count($dataSet[0]), '?'));
             $sql = "INSERT INTO {$tableName} ({$columns}) VALUES ({$placeholders})";
-            $stmt = $this->connection->prepare($sql);
+            $stmt = self::$connection->prepare($sql);
 
-            $this->connection->beginTransaction();
+            self::$connection->beginTransaction();
             foreach ($dataSet as $data) {
                 $stmt->execute(array_values($data));
             }
-            $this->connection->commit();
+            self::$connection->commit();
             
         } catch (PDOException $e) {
-            $this->connection->rollBack();
+            self::$connection->rollBack();
             throw new \Exception("Erreur lors de l'insertion dans {$tableName}: " . $e->getMessage());
         }
     }
     
-    public function createTables() {
+    public static function createTables() {
         try {
-            $this->connection->beginTransaction();
+            self::$connection->beginTransaction();
     
-            $this->connection->exec("CREATE TABLE IF NOT EXISTS User (
+            self::$connection->exec("CREATE TABLE IF NOT EXISTS User (
                 idUser INTEGER PRIMARY KEY AUTOINCREMENT,
                 username TEXT NOT NULL,
                 password TEXT NOT NULL
             )");
     
-            $this->connection->exec("CREATE TABLE IF NOT EXISTS FoodType (
+            self::$connection->exec("CREATE TABLE IF NOT EXISTS FoodType (
                 type TEXT PRIMARY KEY
             )");
     
-            $this->connection->exec("CREATE TABLE IF NOT EXISTS Restaurant (
+            self::$connection->exec("CREATE TABLE IF NOT EXISTS Restaurant (
                 idRestau INTEGER PRIMARY KEY AUTOINCREMENT,
                 address TEXT,
                 nameR TEXT NOT NULL,
@@ -84,12 +81,12 @@ class Database {
                 delivery INTEGER NOT NULL DEFAULT 0
             )");
     
-            $this->connection->exec("CREATE TABLE IF NOT EXISTS Photo (
+            self::$connection->exec("CREATE TABLE IF NOT EXISTS Photo (
                 idPhoto INTEGER PRIMARY KEY AUTOINCREMENT,
                 image TEXT NOT NULL
             )");
     
-            $this->connection->exec("CREATE TABLE IF NOT EXISTS Serves (
+            self::$connection->exec("CREATE TABLE IF NOT EXISTS Serves (
                 idRestau INTEGER,
                 type TEXT,
                 PRIMARY KEY (idRestau, type),
@@ -97,7 +94,7 @@ class Database {
                 FOREIGN KEY (type) REFERENCES FoodType(type) ON DELETE CASCADE
             )");
     
-            $this->connection->exec("CREATE TABLE IF NOT EXISTS Prefers (
+            self::$connection->exec("CREATE TABLE IF NOT EXISTS Prefers (
                 idUser INTEGER,
                 type TEXT,
                 PRIMARY KEY (idUser, type),
@@ -105,7 +102,7 @@ class Database {
                 FOREIGN KEY (type) REFERENCES FoodType(type) ON DELETE CASCADE
             )");
     
-            $this->connection->exec("CREATE TABLE IF NOT EXISTS Illustrates (
+            self::$connection->exec("CREATE TABLE IF NOT EXISTS Illustrates (
                 idPhoto INTEGER,
                 idRestau INTEGER,
                 PRIMARY KEY (idPhoto, idRestau),
@@ -113,7 +110,7 @@ class Database {
                 FOREIGN KEY (idRestau) REFERENCES Restaurant(idRestau) ON DELETE CASCADE
             )");
     
-            $this->connection->exec("CREATE TABLE IF NOT EXISTS Reviewed (
+            self::$connection->exec("CREATE TABLE IF NOT EXISTS Reviewed (
                 idUser INTEGER,
                 idRestau INTEGER,
                 note INTEGER CHECK (note BETWEEN 0 AND 5),
@@ -123,7 +120,7 @@ class Database {
                 FOREIGN KEY (idRestau) REFERENCES Restaurant(idRestau) ON DELETE CASCADE
             )");
     
-            $this->connection->exec("CREATE TABLE IF NOT EXISTS Likes (
+            self::$connection->exec("CREATE TABLE IF NOT EXISTS Likes (
                 idUser INTEGER,
                 idRestau INTEGER,
                 PRIMARY KEY (idUser, idRestau),
@@ -131,14 +128,14 @@ class Database {
                 FOREIGN KEY (idRestau) REFERENCES Restaurant(idRestau) ON DELETE CASCADE
             )");
     
-            $this->connection->commit();
+            self::$connection->commit();
         } catch (PDOException $e) {
-            $this->connection->rollBack();
+            self::$connection->rollBack();
             throw new \Exception("Erreur lors de la création des tables: " . $e->getMessage());
         }
     }
     
-    public function deleteTables() {
+    public static function deleteTables() {
         try {
             $sql = "
             DROP TABLE IF EXISTS Likes;
@@ -151,7 +148,7 @@ class Database {
             DROP TABLE IF EXISTS FoodType;
             DROP TABLE IF EXISTS User;
             ";
-            $this->connection->exec($sql);
+            self::$connection->exec($sql);
         } catch (PDOException $e) {
             throw new \Exception("Erreur lors de la suppression des tables: " . $e->getMessage());
         }
