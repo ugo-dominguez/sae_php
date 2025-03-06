@@ -11,7 +11,7 @@ class Database {
         try {
             $this->connection = new PDO("sqlite:" . $dbPath);
             $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        } catch (\PDOException $e) {
+        } catch (PDOException $e) {
             throw new \Exception("Échec de connexion à la BD : " . $e->getMessage());
         }
     }
@@ -35,7 +35,7 @@ class Database {
             }, $data);
 
             $this->insertInto('Restaurant', $restaurantsToInsert);
-        } catch (\PDOException $e) {
+        } catch (PDOException $e) {
             throw new \Exception("Erreur lors de l'insertion des restaurants: " . $e->getMessage());
         }
     }
@@ -53,7 +53,7 @@ class Database {
             }
             $this->connection->commit();
             
-        } catch (\PDOException $e) {
+        } catch (PDOException $e) {
             $this->connection->rollBack();
             throw new \Exception("Erreur lors de l'insertion dans {$tableName}: " . $e->getMessage());
         }
@@ -132,7 +132,7 @@ class Database {
             )");
     
             $this->connection->commit();
-        } catch (\PDOException $e) {
+        } catch (PDOException $e) {
             $this->connection->rollBack();
             throw new \Exception("Erreur lors de la création des tables: " . $e->getMessage());
         }
@@ -152,7 +152,7 @@ class Database {
             DROP TABLE IF EXISTS User;
             ";
             $this->connection->exec($sql);
-        } catch (\PDOException $e) {
+        } catch (PDOException $e) {
             throw new \Exception("Erreur lors de la suppression des tables: " . $e->getMessage());
         }
     }
