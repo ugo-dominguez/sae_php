@@ -5,7 +5,7 @@ use PDO;
 use PDOException;
 
 class Database {
-    public static string $dbPath = ROOT_DIR . 'baratie.db';
+    public static string $dbPath = ROOT_DIR . '/baratie.db';
     public static PDO $connection;
     
     public static function setConnection() {

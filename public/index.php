@@ -38,7 +38,7 @@ try {
         Database::insertRestaurants($data);
     }
     Database::setConnection();
-    Requests::setConnexion();
+    Requests::setConnection();
 
 } catch (\Exception $e) {
     http_response_code($e->getCode() ?: 500);
