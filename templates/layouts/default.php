@@ -7,10 +7,9 @@
     <link rel="stylesheet" href="/assets/css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" rel="stylesheet"/>
 </head>
-<?php require ROOT_DIR . '/templates/partials/header.php'; ?>
 <body>
+    <?php require ROOT_DIR . '/templates/partials/header.php'; ?>
     <?php require ROOT_DIR . "/templates/$template.php"; ?>
-    
     <script src="/assets/js/script.js"></script>
 </body>
 </html>

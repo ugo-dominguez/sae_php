@@ -2,8 +2,8 @@
     <div class="header__top">
         <img class="logo" src="/assets/images/logo.png" alt="">
         <div class="auth-buttons">
-            <button class="login btn"><strong>Connexion</strong></button>
-            <button class="signin btn"><strong>Inscription</strong></button>
+            <a href="/login" class="login btn"><strong>Connexion</strong></a>
+            <a href="/register" class="signin btn"><strong>Inscription</strong></a>
         </div>
     </div>
 </header>
