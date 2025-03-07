@@ -9,6 +9,7 @@ use App\Config\Database;
 use App\Config\Router;
 use App\Config\Requests;
 use App\Controllers\HomeController;
+use App\Controllers\SearchController;
 
 session_start();
 
@@ -19,11 +20,13 @@ $path = trim($path, '/');
 
 try {
     // Init
-    $controller = new HomeController();
     $router = new Router();
 
     // Urls
-    $router->get('', [$controller, 'home']);
+    $router->get('/', [new HomeController(), 'home']);
+    $router->get('/search', [new SearchController(), 'search']);
+
+    $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
     $router->dispatch($path);
 
 } catch (\Exception $e) {

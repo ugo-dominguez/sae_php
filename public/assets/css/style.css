@@ -11,7 +11,7 @@ body {
     color: #333; 
 }
 
-.header, .header__main { 
+.header, .header__main, .header__search { 
     background-color: #6cc5d9; 
 }
 
@@ -52,6 +52,15 @@ body {
     justify-content: space-around; 
     position: relative; 
     height: 42vh;
+    overflow: hidden;
+}
+
+.header__search { 
+    display: flex; 
+    align-items: center; 
+    justify-content: space-around; 
+    position: relative; 
+    height: 26vh;
     overflow: hidden;
 }
 
@@ -128,7 +137,7 @@ body {
 
 .restaurant-list { 
     display: flex; 
-    justify-content: space-between; 
+    justify-content: left; 
     flex-wrap: wrap; 
     gap: 1rem; 
 }

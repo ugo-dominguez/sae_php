@@ -11,6 +11,10 @@ class Router {
     public function dispatch(string $path) {
         $method = $_SERVER['REQUEST_METHOD'];
 
+        if ($path === '' || $path === '/') {
+            $path = '/';
+        }
+
         if (isset($this->routes[$method][$path])) {
             call_user_func($this->routes[$method][$path]);
         } else {

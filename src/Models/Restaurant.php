@@ -1,15 +1,17 @@
 <?php
 namespace App\Models;
 
+use App\Config\Requests;
+
 class Restaurant {
     public int $id;
     public string $name;
     public ?string $address;
-    public ?string $schedule;
     public ?string $website;
     public ?string $phone;
     public bool $accessible;
     public bool $delivery;
+    public ?array $schedule;
 
     public static array $days = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su', 'PH'];
     
@@ -17,66 +19,17 @@ class Restaurant {
         $this->id = (int) $data['idRestau'];
         $this->name = $data['nameR'];
         $this->city = $data['city'] ?? null;
-        $this->schedule = $data['schedule'] ?? null;
         $this->website = $data['website'] ?? null;
         $this->phone = $data['phone'] ?? null;
         $this->lat = $data['latitude'] ?? null;
         $this->lng = $data['longitude'] ?? null;
         $this->accessible = (bool) $data['accessibl'];
         $this->delivery = (bool) $data['delivery'];
+        $this->schedule = !empty($data['schedule']) ? self::mapSchedule($data['schedule']) : null;
     }
 
     public function getAddress() {
-        $url = "https://nominatim.openstreetmap.org/reverse?format=json&lat=$this->lat&lon=$this->lng";
-    
-        $opts = [
-            "http" => [
-                "header" => "User-Agent: MyPHPApp"
-            ]
-        ];
-        $context = stream_context_create($opts);
-        $response = file_get_contents($url, false, $context);
-        $data = json_decode($response, true);
-
-        $houseNumber = $data['address']['house_number'] ?? '';
-        $road = $data['address']['road'] ?? $data['address']['square'] ?? '';
-        $city = $data['address']['city'];
-        $formatted_address = trim("$houseNumber $road, $city");
-        return $formatted_address ?? "Address not found";
-    }
-
-    public function parseSchedule() {
-        $parts = array_map('trim', explode(';', $this->schedule));
-        $schedule = [];
-        
-        foreach ($parts as $part) {
-            if (empty($part)) {
-                continue;
-            }
-
-            list($days, $hours) = explode(' ', $part, 2);
-            $daysList = explode(',', $days);
-            $timeRanges = explode(',', $hours);
-            
-            foreach ($daysList as $day) {
-                if (strpos($day, '-') !== false) {
-                    list($startDay, $endDay) = explode('-', $day);
-                    $daysRange = $this->getDaysInRange($startDay, $endDay);
-                    foreach ($daysRange as $singleDay) {
-                        $schedule[$singleDay] = $timeRanges;
-                    }
-                } else {
-                    $schedule[$day] = $timeRanges;
-                }
-            }
-        }
-        return $schedule;
-    }
-    
-    public function getDaysInRange($startDay, $endDay) {
-        $startIdx = array_search($startDay, self::$days);
-        $endIdx = array_search($endDay, self::$days);
-        return array_slice(self::$days, $startIdx, $endIdx - $startIdx + 1);
+        return $this->city;
     }
 
     public function getCurrentDayTime() {
@@ -90,10 +43,9 @@ class Restaurant {
 
     public function isCurrentlyOpen() {
         ['day' => $currentDay, 'time' => $currentTime] = $this->getCurrentDayTime();
-        $mapSchedule = $this->parseSchedule();
     
-        if (isset($mapSchedule[$currentDay])) {
-            foreach ($mapSchedule[$currentDay] as $timeRange) {
+        if (isset($this->schedule[$currentDay])) {
+            foreach ($this->schedule[$currentDay] as $timeRange) {
                 list($openTime, $closeTime) = explode('-', $timeRange);
                 if ($currentTime >= $openTime && $currentTime <= $closeTime) {
                     return true;
@@ -105,10 +57,9 @@ class Restaurant {
 
     public function whenWillClose(): string {
         ['day' => $currentDay, 'time' => $currentTime] = $this->getCurrentDayTime();
-        $mapSchedule = $this->parseSchedule();
 
-        if (isset($mapSchedule[$currentDay])) {
-            foreach ($mapSchedule[$currentDay] as $timeRange) {
+        if (isset($this->schedule[$currentDay])) {
+            foreach ($this->schedule[$currentDay] as $timeRange) {
                 list($openTime, $closeTime) = explode('-', $timeRange);
                 if ($currentTime >= $openTime && $currentTime <= $closeTime) {
                     return $closeTime;
@@ -120,10 +71,9 @@ class Restaurant {
 
     public function whenWillOpen(): string {
         ['day' => $currentDay, 'time' => $currentTime] = $this->getCurrentDayTime();
-        $mapSchedule = $this->parseSchedule();
     
-        if (isset($mapSchedule[$currentDay])) {
-            foreach ($mapSchedule[$currentDay] as $slot) {
+        if (isset($this->schedule[$currentDay])) {
+            foreach ($this->schedule[$currentDay] as $slot) {
                 [$start, $end] = explode('-', $slot);
     
                 if ($currentTime < $start) {
@@ -135,9 +85,45 @@ class Restaurant {
         $currentIndex = array_search($currentDay, self::$days);
         $nextDay = self::$days[($currentIndex + 1) % 7];
     
-        if (isset($mapSchedule[$nextDay])) {
-            return $mapSchedule[$nextDay][0] ? explode('-', $mapSchedule[$nextDay][0])[0] : null;
+        if (isset($this->schedule[$nextDay])) {
+            return $this->schedule[$nextDay][0] ? explode('-', $this->schedule[$nextDay][0])[0] : null;
         }
         return 'N/A'; 
+    }
+
+    public static function getDaysInRange($startDay, $endDay) {
+        $startIdx = array_search($startDay, self::$days);
+        $endIdx = array_search($endDay, self::$days);
+        return array_slice(self::$days, $startIdx, $endIdx - $startIdx + 1);
+    }
+
+    public static function mapSchedule(string $schedule) {
+        $parts = array_map('trim', explode(';', $schedule));
+        $mappedSchedule = [];
+        
+        foreach ($parts as $part) {
+            if (empty($part)) {
+                continue;
+            }
+
+            $exploded = explode(' ', $part, 2);
+            $days = $exploded[0] ?? '';
+            $hours = $exploded[1] ?? '';
+            $daysList = explode(',', $days);
+            $timeRanges = !empty($hours) ? explode(',', $hours) : [];
+            
+            foreach ($daysList as $day) {
+                if (strpos($day, '-') !== false) {
+                    list($startDay, $endDay) = explode('-', $day);
+                    $daysRange = self::getDaysInRange($startDay, $endDay);
+                    foreach ($daysRange as $singleDay) {
+                        $mappedSchedule[$singleDay] = $timeRanges;
+                    }
+                } else {
+                    $mappedSchedule[$day] = $timeRanges;
+                }
+            }
+        }
+        return $mappedSchedule;
     }
 }
