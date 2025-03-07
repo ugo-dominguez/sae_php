@@ -40,9 +40,18 @@ class AuthController extends BaseController {
     }
     
     public function login(): void {
-        $username = $_POST['username'] ?? '';
+        $username = strtolower(trim($_POST['username'] ?? ''));
         $password = $_POST['password'] ?? '';
-        $user = User::findByUsername($username);
+    
+        error_log("Tentative de connexion pour username: '{$username}'");
+    
+        $user = \App\Models\User::findByUsername($username);
+        if (!$user) {
+            error_log("Aucun utilisateur trouvé pour username: '{$username}'");
+        } else {
+            error_log("Hash stocké: " . $user->getPassword());
+        }
+    
         if ($user && password_verify($password, $user->getPassword())) {
             $_SESSION['user_id'] = $user->getIdUser();
             $this->redirect('');
@@ -51,6 +60,8 @@ class AuthController extends BaseController {
             $this->render('auth/login', ['pageTitle' => 'Connexion', 'error' => $error]);
         }
     }
+    
+    
     
     public function logout(): void {
         session_destroy();

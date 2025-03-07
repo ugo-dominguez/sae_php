@@ -57,12 +57,26 @@ class User {
      */
     public static function findByUsername($username) {
         $db = Database::getConnection();
-        $stmt = $db->prepare("SELECT * FROM user WHERE username = :username");
+    
+        error_log("Nombre d'utilisateurs en base: " . $db->query("SELECT COUNT(*) FROM User")->fetchColumn());
+    
+        $stmt = $db->prepare("SELECT * FROM User WHERE username = :username");
         $stmt->bindValue(':username', $username, PDO::PARAM_STR);
         $stmt->execute();
-        $stmt->setFetchMode(PDO::FETCH_CLASS, __CLASS__);
-        return $stmt->fetch();
+    
+        $stmt->setFetchMode(PDO::FETCH_ASSOC);
+        $row = $stmt->fetch();
+    
+        error_log("Recherche de '$username' => " . print_r($row, true));
+    
+        if (!$row) {
+            return false;
+        }
+        
+        $user = new User($row['idUser'], $row['username'], $row['password']);
+        return $user;
     }
+    
 
     /**
      * @param string $username
