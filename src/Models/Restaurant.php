@@ -10,6 +10,8 @@ class Restaurant {
     public ?string $phone;
     public bool $accessible;
     public bool $delivery;
+
+    public static array $days = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su', 'PH'];
     
     public function __construct(array $data) {
         $this->id = (int) $data['idRestau'];
@@ -72,20 +74,26 @@ class Restaurant {
     }
     
     public function getDaysInRange($startDay, $endDay) {
-        $days = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su', 'PH'];
-        $startIdx = array_search($startDay, $days);
-        $endIdx = array_search($endDay, $days);
-        return array_slice($days, $startIdx, $endIdx - $startIdx + 1);
+        $startIdx = array_search($startDay, self::$days);
+        $endIdx = array_search($endDay, self::$days);
+        return array_slice(self::$days, $startIdx, $endIdx - $startIdx + 1);
+    }
+
+    public function getCurrentDayTime() {
+        date_default_timezone_set('Europe/Paris');
+
+        return [
+            'day' => substr(date('D'), 0, 2),
+            'time' => date('H:i')
+        ];
     }
 
     public function isCurrentlyOpen() {
-        date_default_timezone_set('Europe/Paris');
-        $currentDay = date('D');
-        $currentTime = date('H:i');
-        $parsedSchedule = $this->parseSchedule();
+        ['day' => $currentDay, 'time' => $currentTime] = $this->getCurrentDayTime();
+        $mapSchedule = $this->parseSchedule();
     
-        if (isset($parsedSchedule[$currentDay])) {
-            foreach ($parsedSchedule[$currentDay] as $timeRange) {
+        if (isset($mapSchedule[$currentDay])) {
+            foreach ($mapSchedule[$currentDay] as $timeRange) {
                 list($openTime, $closeTime) = explode('-', $timeRange);
                 if ($currentTime >= $openTime && $currentTime <= $closeTime) {
                     return true;
@@ -93,5 +101,43 @@ class Restaurant {
             }
         }
         return false;
+    }
+
+    public function whenWillClose(): string {
+        ['day' => $currentDay, 'time' => $currentTime] = $this->getCurrentDayTime();
+        $mapSchedule = $this->parseSchedule();
+
+        if (isset($mapSchedule[$currentDay])) {
+            foreach ($mapSchedule[$currentDay] as $timeRange) {
+                list($openTime, $closeTime) = explode('-', $timeRange);
+                if ($currentTime >= $openTime && $currentTime <= $closeTime) {
+                    return $closeTime;
+                }
+            }
+        }
+        return 'N/A';
+    }
+
+    public function whenWillOpen(): string {
+        ['day' => $currentDay, 'time' => $currentTime] = $this->getCurrentDayTime();
+        $mapSchedule = $this->parseSchedule();
+    
+        if (isset($mapSchedule[$currentDay])) {
+            foreach ($mapSchedule[$currentDay] as $slot) {
+                [$start, $end] = explode('-', $slot);
+    
+                if ($currentTime < $start) {
+                    return $start;
+                }
+            }
+        }
+
+        $currentIndex = array_search($currentDay, self::$days);
+        $nextDay = self::$days[($currentIndex + 1) % 7];
+    
+        if (isset($mapSchedule[$nextDay])) {
+            return $mapSchedule[$nextDay][0] ? explode('-', $mapSchedule[$nextDay][0])[0] : null;
+        }
+        return 'N/A'; 
     }
 }

@@ -40,11 +40,13 @@ $restaurants = Requests::getRestaurants(5);
             <img src="/assets/images/baratie.jpg" alt="<?= htmlspecialchars($restaurant->name) ?>">
             <h3><?= htmlspecialchars($restaurant->name) ?></h3>
             <p><?= htmlspecialchars($restaurant->getAddress()) ?></p>
-
-            <?php if ($restaurant->isCurrentlyOpen()): ?>
-                <p><span style="color: green;">Ouvert</span> • Ferme à</p>
-            <?php else: ?>
-                <p><span style="color: red;">Fermé</span> • Ouvre à</p>
+            
+            <?php if (isset($restaurant->schedule)): ?>
+                <?php if ($restaurant->isCurrentlyOpen()): ?>
+                    <p><span style="color: green;">Ouvert</span> • Ferme à <?= htmlspecialchars($restaurant->whenWillClose()) ?></p>
+                <?php else: ?>
+                    <p><span style="color: red;">Fermé</span> • Ouvre à <?= htmlspecialchars($restaurant->whenWillOpen()) ?></p>
+                <?php endif; ?>
             <?php endif; ?>
 
             <?php if ($restaurant->accessible): ?>
