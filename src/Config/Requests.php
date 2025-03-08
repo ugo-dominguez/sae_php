@@ -44,6 +44,19 @@ class Requests {
         }
     }
 
+    public static function getRestaurantById(int $id) {
+        try {
+            $query = "SELECT * FROM Restaurant WHERE idRestau = ?";
+            $stmt = self::$connection->prepare($query);
+            $stmt->execute([$id]);
+
+            return self::makeRestaurants($stmt)[0];
+        } catch (PDOException $e) {
+            error_log("Erreur lors de la récupération d'un restaurant: " . $e->getMessage());
+            return null;
+        }
+    }
+
     public static function searchRestaurants($keywords, $city, $type) {
         try {
             $sql = "SELECT * FROM Restaurant WHERE 1=1";

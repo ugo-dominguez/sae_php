@@ -15,11 +15,16 @@ class Router {
             $path = '/';
         }
 
-        if (isset($this->routes[$method][$path])) {
-            call_user_func($this->routes[$method][$path]);
-        } else {
-            http_response_code(404);
-            echo "Page not found";
+        foreach ($this->routes[$method] as $route => $callback) {
+            $pattern = preg_replace('/\{([^\/]+)\}/', '([^/]+)', $route);
+            if (preg_match("#^$pattern$#", $path, $matches)) {
+                array_shift($matches); // Remove full match
+                call_user_func_array($callback, $matches);
+                return;
+            }
         }
+
+        http_response_code(404);
+        echo "Page not found";
     }
 }
