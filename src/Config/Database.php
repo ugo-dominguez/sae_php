@@ -127,13 +127,12 @@ class Database {
     public static function createTables() {
         try {
             self::$connection->beginTransaction();
-    
             self::$connection->exec("CREATE TABLE IF NOT EXISTS User (
                 idUser INTEGER PRIMARY KEY AUTOINCREMENT,
                 username TEXT NOT NULL,
                 password TEXT NOT NULL
             )");
-    
+
             self::$connection->exec("CREATE TABLE IF NOT EXISTS FoodType (
                 type TEXT PRIMARY KEY
             )");
@@ -151,12 +150,12 @@ class Database {
                 accessibl INTEGER NOT NULL DEFAULT 0, 
                 delivery INTEGER NOT NULL DEFAULT 0
             )");
-    
+
             self::$connection->exec("CREATE TABLE IF NOT EXISTS Photo (
                 idPhoto INTEGER PRIMARY KEY AUTOINCREMENT,
                 image TEXT NOT NULL
             )");
-    
+
             self::$connection->exec("CREATE TABLE IF NOT EXISTS Serves (
                 idRestau INTEGER,
                 type TEXT,
@@ -164,7 +163,7 @@ class Database {
                 FOREIGN KEY (idRestau) REFERENCES Restaurant(idRestau) ON DELETE CASCADE,
                 FOREIGN KEY (type) REFERENCES FoodType(type) ON DELETE CASCADE
             )");
-    
+
             self::$connection->exec("CREATE TABLE IF NOT EXISTS Prefers (
                 idUser INTEGER,
                 type TEXT,
@@ -172,7 +171,7 @@ class Database {
                 FOREIGN KEY (idUser) REFERENCES User(idUser) ON DELETE CASCADE,
                 FOREIGN KEY (type) REFERENCES FoodType(type) ON DELETE CASCADE
             )");
-    
+
             self::$connection->exec("CREATE TABLE IF NOT EXISTS Illustrates (
                 idPhoto INTEGER,
                 idRestau INTEGER,
@@ -180,7 +179,7 @@ class Database {
                 FOREIGN KEY (idPhoto) REFERENCES Photo(idPhoto) ON DELETE CASCADE,
                 FOREIGN KEY (idRestau) REFERENCES Restaurant(idRestau) ON DELETE CASCADE
             )");
-    
+
             self::$connection->exec("CREATE TABLE IF NOT EXISTS Reviewed (
                 idUser INTEGER,
                 idRestau INTEGER,
@@ -190,7 +189,7 @@ class Database {
                 FOREIGN KEY (idUser) REFERENCES User(idUser) ON DELETE CASCADE,
                 FOREIGN KEY (idRestau) REFERENCES Restaurant(idRestau) ON DELETE CASCADE
             )");
-    
+
             self::$connection->exec("CREATE TABLE IF NOT EXISTS Likes (
                 idUser INTEGER,
                 idRestau INTEGER,
@@ -198,7 +197,7 @@ class Database {
                 FOREIGN KEY (idUser) REFERENCES User(idUser) ON DELETE CASCADE,
                 FOREIGN KEY (idRestau) REFERENCES Restaurant(idRestau) ON DELETE CASCADE
             )");
-    
+
             self::$connection->commit();
         } catch (PDOException $e) {
             self::$connection->rollBack();
@@ -220,8 +219,10 @@ class Database {
             DROP TABLE IF EXISTS User;
             ";
             self::$connection->exec($sql);
+
         } catch (PDOException $e) {
-            throw new \Exception("Erreur lors de la suppression des tables: " . $e->getMessage());
+            self::$connection->rollBack();
+            throw new \Exception("Erreur lors de l'insertion dans {$tableName}: " . $e->getMessage());
         }
     }
 }

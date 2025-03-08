@@ -2,12 +2,19 @@
 namespace App\Config;
 
 class Router {
-    private array $routes = [];
+    private array $routes = [
+        'GET' => [],
+        'POST' => []
+    ];
     
-    public function get(string $path, callable $callback) {
+    public function get(string $path, $callback) {
         $this->routes['GET'][$path] = $callback;
     }
-
+    
+    public function post(string $path, $callback) {
+        $this->routes['POST'][$path] = $callback;
+    }
+    
     public function dispatch(string $path) {
         $method = $_SERVER['REQUEST_METHOD'];
 
