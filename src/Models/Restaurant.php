@@ -1,100 +1,129 @@
 <?php
+namespace App\Models;
+
+use App\Config\Requests;
 
 class Restaurant {
-    private $idRestau;
-    private $address;
-    private $nameR;
-    private $schedule;
-    private $website;
-    private $phone;
-    private $accessible;
-    private $delivery;
+    public int $id;
+    public string $name;
+    public ?string $address;
+    public ?string $website;
+    public ?string $phone;
+    public bool $accessible;
+    public bool $delivery;
+    public ?array $schedule;
+
+    public static array $days = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su', 'PH'];
     
-    public function __construct($idRestau = null, $address = null, $nameR = null, $schedule = null, 
-                               $website = null, $phone = null, $accessible = false, $delivery = false) {
-        $this->idRestau = $idRestau;
-        $this->address = $address;
-        $this->nameR = $nameR;
-        $this->schedule = $schedule;
-        $this->website = $website;
-        $this->phone = $phone;
-        $this->accessible = $accessible;
-        $this->delivery = $delivery;
+    public function __construct(array $data) {
+        $this->id = (int) $data['idRestau'];
+        $this->name = $data['nameR'];
+        $this->city = $data['city'] ?? null;
+        $this->website = $data['website'] ?? null;
+        $this->phone = $data['phone'] ?? null;
+        $this->lat = $data['latitude'] ?? null;
+        $this->lng = $data['longitude'] ?? null;
+        $this->accessible = (bool) $data['accessibl'];
+        $this->delivery = (bool) $data['delivery'];
+        $this->schedule = !empty($data['schedule']) ? self::mapSchedule($data['schedule']) : null;
     }
-    
-    public function getIdRestau() {
-        return $this->idRestau;
-    }
-    
-    public function setIdRestau($idRestau) {
-        $this->idRestau = $idRestau;
-    }
-    
+
     public function getAddress() {
-        return $this->address;
+        return $this->city;
     }
-    
-    public function setAddress($address) {
-        $this->address = $address;
+
+    public function getCurrentDayTime() {
+        date_default_timezone_set('Europe/Paris');
+
+        return [
+            'day' => substr(date('D'), 0, 2),
+            'time' => date('H:i')
+        ];
     }
+
+    public function isCurrentlyOpen() {
+        ['day' => $currentDay, 'time' => $currentTime] = $this->getCurrentDayTime();
     
-    public function getNameR() {
-        return $this->nameR;
+        if (isset($this->schedule[$currentDay])) {
+            foreach ($this->schedule[$currentDay] as $timeRange) {
+                list($openTime, $closeTime) = explode('-', $timeRange);
+                if ($currentTime >= $openTime && $currentTime <= $closeTime) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
-    
-    public function setNameR($nameR) {
-        $this->nameR = $nameR;
+
+    public function whenWillClose(): string {
+        ['day' => $currentDay, 'time' => $currentTime] = $this->getCurrentDayTime();
+
+        if (isset($this->schedule[$currentDay])) {
+            foreach ($this->schedule[$currentDay] as $timeRange) {
+                list($openTime, $closeTime) = explode('-', $timeRange);
+                if ($currentTime >= $openTime && $currentTime <= $closeTime) {
+                    return $closeTime;
+                }
+            }
+        }
+        return 'N/A';
     }
+
+    public function whenWillOpen(): string {
+        ['day' => $currentDay, 'time' => $currentTime] = $this->getCurrentDayTime();
     
-    public function getSchedule() {
-        return $this->schedule;
+        if (isset($this->schedule[$currentDay])) {
+            foreach ($this->schedule[$currentDay] as $slot) {
+                [$start, $end] = explode('-', $slot);
+    
+                if ($currentTime < $start) {
+                    return $start;
+                }
+            }
+        }
+
+        $currentIndex = array_search($currentDay, self::$days);
+        $nextDay = self::$days[($currentIndex + 1) % 7];
+    
+        if (isset($this->schedule[$nextDay])) {
+            return $this->schedule[$nextDay][0] ? explode('-', $this->schedule[$nextDay][0])[0] : null;
+        }
+        return 'N/A'; 
     }
-    
-    public function setSchedule($schedule) {
-        $this->schedule = $schedule;
+
+    public static function getDaysInRange($startDay, $endDay) {
+        $startIdx = array_search($startDay, self::$days);
+        $endIdx = array_search($endDay, self::$days);
+        return array_slice(self::$days, $startIdx, $endIdx - $startIdx + 1);
     }
-    
-    public function getWebsite() {
-        return $this->website;
-    }
-    
-    public function setWebsite($website) {
-        $this->website = $website;
-    }
-    
-    public function getPhone() {
-        return $this->phone;
-    }
-    
-    public function setPhone($phone) {
-        $this->phone = $phone;
-    }
-    
-    public function isAccessible() {
-        return $this->accessible;
-    }
-    
-    public function setAccessible($accessible) {
-        $this->accessible = $accessible;
-    }
-    
-    public function hasDelivery() {
-        return $this->delivery;
-    }
-    
-    public function setDelivery($delivery) {
-        $this->delivery = $delivery;
-    }
-    
-    public function getFoodTypes() {
-        // Example: SELECT * FROM FoodType JOIN Serves ON FoodType.type = Serves.type WHERE Serves.idRestau = $this->idRestau
-    }
-    
-    public function getPhotos() {
-        // Example: SELECT * FROM Photo JOIN Illustrates ON Photo.idPhoto = Illustrates.idPhoto WHERE Illustrates.idRestau = $this->idRestau
-    }
-    
-    public function getReviews() {
-        // Example: SELECT * FROM Reviewed WHERE idRestau = $this->idRestau
+
+    public static function mapSchedule(string $schedule) {
+        $parts = array_map('trim', explode(';', $schedule));
+        $mappedSchedule = [];
+        
+        foreach ($parts as $part) {
+            if (empty($part)) {
+                continue;
+            }
+
+            $exploded = explode(' ', $part, 2);
+            $days = $exploded[0] ?? '';
+            $hours = $exploded[1] ?? '';
+            $daysList = explode(',', $days);
+            $timeRanges = !empty($hours) ? explode(',', $hours) : [];
+            
+            foreach ($daysList as $day) {
+                if (strpos($day, '-') !== false) {
+                    list($startDay, $endDay) = explode('-', $day);
+                    $daysRange = self::getDaysInRange($startDay, $endDay);
+                    foreach ($daysRange as $singleDay) {
+                        $mappedSchedule[$singleDay] = $timeRanges;
+                    }
+                } else {
+                    $mappedSchedule[$day] = $timeRanges;
+                }
+            }
+        }
+        return $mappedSchedule;
     }
 }

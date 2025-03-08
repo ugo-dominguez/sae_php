@@ -9,6 +9,9 @@ use App\Config\Router;
 use App\Config\Requests;
 use App\Controllers\HomeController;
 use App\Controllers\AuthController;
+use App\Controllers\SearchController;
+use App\Controllers\RestaurantController;
+
 
 session_start();
 
@@ -17,27 +20,25 @@ $path = parse_url($request, PHP_URL_PATH);
 $path = trim($path, '/');
 
 try {
-    $dbPath = ROOT_DIR . '/baratie.db';
-    if (!file_exists($dbPath)) {
-        Database::setConnection();
-        Database::createTables();
-        $jsonFilePath = __DIR__ . "/assets/restaurants_orleans.json";
-        $provider = new Provider($jsonFilePath);
-        $data = $provider->getData();
-        Database::insertRestaurants($data);
-    }
-    Database::setConnection();
-    Requests::setConnexion();
-
+    // Init
     $router = new Router();
-    $router->get('', [HomeController::class, 'home']);
-    $router->get('register', [AuthController::class, 'registerForm']);
-    $router->post('register', [AuthController::class, 'registerSubmit']);
-    $router->get('login', [AuthController::class, 'showLoginForm']);
-    $router->post('login', [AuthController::class, 'login']);
-    $router->get('logout', [AuthController::class, 'logout']);
-    $router->get('profile', [AuthController::class, 'profile']);
+
+    // Urls
+    $router->get('/', [new HomeController(), 'home']);
+    $router->get('/search', [new SearchController(), 'search']);
+    $router->get('/restaurant/{id}', function ($id) {
+        (new RestaurantController())->show($id);
+    });
+    $router->get('/register', [new AuthController(), 'registerForm']);
+    $router->post('/register', new AuthController(), 'registerSubmit']);
+    $router->get('/login', [new AuthController(), 'showLoginForm']);
+    $router->post('/login', [new AuthController(), 'login']);
+    $router->get('/logout', [new AuthController(), 'logout']);
+    $router->get('/profile', [new AuthController(), 'profile']);
+  
+    $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
     $router->dispatch($path);
+
 } catch (\Exception $e) {
     http_response_code($e->getCode() ?: 500);
     echo "Erreur : " . $e->getMessage();
