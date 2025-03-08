@@ -30,7 +30,7 @@ try {
         (new RestaurantController())->show($id);
     });
     $router->get('/register', [new AuthController(), 'registerForm']);
-    $router->post('/register', new AuthController(), 'registerSubmit']);
+    $router->post('/register', [new AuthController(), 'registerSubmit']);
     $router->get('/login', [new AuthController(), 'showLoginForm']);
     $router->post('/login', [new AuthController(), 'login']);
     $router->get('/logout', [new AuthController(), 'logout']);
