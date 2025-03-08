@@ -1,15 +1,7 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <title>Inscription</title>
-  <link rel="stylesheet" href="/assets/css/register.css">
-</head>
-<body>
+
+<h1 class="register-title">Inscription</h1>
 
 <div class="register-wrapper">
-  <h1 class="register-title">Inscription</h1>
-  
   <form action="/register" method="POST" class="register-form">
     <!-- Identifiant -->
     <label for="username">Identifiant</label>
@@ -41,10 +33,6 @@
       required
     />
 
-    <!-- Bouton s'inscrire -->
     <button type="submit">S'inscrire</button>
   </form>
 </div>
-
-</body>
-</html>

@@ -67,4 +67,16 @@ class AuthController extends BaseController {
         session_destroy();
         $this->redirect('');
     }
+
+
+    public function profile(): void {
+        if (!isset($_SESSION['user_id'])) {
+            $this->redirect('login');
+            return;
+        }
+    
+        $pageTitle = 'Mon profil';
+        $this->render('auth/profile', ['pageTitle' => $pageTitle]);
+    }
+    
 }

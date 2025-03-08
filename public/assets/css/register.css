@@ -1,37 +1,23 @@
+/* register.css */
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-  body {
-    font-family: Arial, sans-serif;
-    background-color: #fff;
-    color: #333;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh; 
-  }
-  
+/* Enlève le body { display: flex; ... } qui centre tout le site. */
+/* Conserve le style spécifique au formulaire. */
 
-  .register-wrapper {
+.register-wrapper {
     width: 350px;
     padding: 2rem;
+    margin: 2rem auto; /* Centre le bloc en horizontal */
     border: 1px solid #ccc;
     border-radius: 12px;
-
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
   }
   
- 
   .register-title {
     font-size: 1.8rem;
     margin-bottom: 1.5rem;
     text-align: center;
   }
   
- 
   .register-form {
     display: flex;
     flex-direction: column;
@@ -43,6 +29,10 @@
     margin-top: 1rem;
   }
   
+  .register-form label:first-of-type {
+    margin-top: 0;
+  }
+  
   .register-form input {
     padding: 0.8rem;
     border: 1px solid #ccc;
@@ -50,12 +40,6 @@
     font-size: 1rem;
   }
   
-
-  .register-form label:first-of-type {
-    margin-top: 0;
-  }
-  
- 
   .register-form button {
     margin-top: 1.5rem;
     padding: 0.8rem;

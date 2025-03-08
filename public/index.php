@@ -36,6 +36,7 @@ try {
     $router->get('login', [AuthController::class, 'showLoginForm']);
     $router->post('login', [AuthController::class, 'login']);
     $router->get('logout', [AuthController::class, 'logout']);
+    $router->get('profile', [AuthController::class, 'profile']);
     $router->dispatch($path);
 } catch (\Exception $e) {
     http_response_code($e->getCode() ?: 500);
