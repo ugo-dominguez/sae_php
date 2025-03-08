@@ -1,27 +1,12 @@
 <?php
+namespace App\Models;
 
 class Likes {
-    private $idUser;
-    private $idRestau;
+    public int $idUser;
+    public int $idRestau;
     
-    public function __construct($idUser = null, $idRestau = null) {
-        $this->idUser = $idUser;
-        $this->idRestau = $idRestau;
-    }
-    
-    public function getIdUser() {
-        return $this->idUser;
-    }
-    
-    public function setIdUser($idUser) {
-        $this->idUser = $idUser;
-    }
-    
-    public function getIdRestau() {
-        return $this->idRestau;
-    }
-    
-    public function setIdRestau($idRestau) {
-        $this->idRestau = $idRestau;
+    public function __construct(array $data) {
+        $this->idUser = $data['idUser'];
+        $this->idRestau = $data['idRestau'];
     }
 }
