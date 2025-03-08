@@ -6,6 +6,7 @@ use PDO;
 use PDOException;
 use App\Config\Database;
 use App\Models\Restaurant;
+use App\Models\User;
 
 class Requests {
     private static ?PDO $connection = null;
@@ -100,6 +101,21 @@ class Requests {
         } catch (PDOException $e) {
             error_log("Erreur lors de la récupération des restaurants: " . $e->getMessage());
             return [];
+        }
+    }
+
+    public static function getUserById(int $id) : User {
+        try {
+            $query = "SELECT * FROM User WHERE idUser = ?";
+            $stmt = self::$connection->prepare($query);
+            $stmt->execute([$id]);
+            
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            return new User($row['idUser'], $row['username'], $row['password']);
+
+        } catch (PDOException $e) {
+            error_log("Erreur lors de la récupération d'un utilisateur: " . $e->getMessage());
+            return null;
         }
     }
 }

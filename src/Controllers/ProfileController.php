@@ -1,0 +1,25 @@
+<?php
+
+namespace App\Controllers;
+
+use App\Config\Requests;
+
+class ProfileController extends BaseController {
+    public function show(string $id): void {
+        $pageTitle = 'Détails de l\'utilisateur';
+
+        Requests::getConnection();
+        $user = Requests::getUserById((int) $id);
+
+        if (!$user) {
+            http_response_code(404);
+            echo "User not found";
+            return;
+        }
+
+        $this->render('profile/profile', [
+            'pageTitle' => $pageTitle,
+            'user' => $user
+        ]);
+    }
+}
