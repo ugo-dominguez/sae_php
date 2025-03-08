@@ -128,7 +128,8 @@ body {
 }
 
 .restaurants { 
-    padding: 2rem; 
+    padding: 2rem;
+    height: 10vh;
 }
 
 .hline {
@@ -189,3 +190,13 @@ body {
     cursor: pointer;
 }
 
+.no-results {
+    margin: 2em;
+    font-size: x-large;
+    text-align: center;
+}
+
+.no-results span {
+    font-size: 4em;
+    padding-bottom: 0.2em;
+}
