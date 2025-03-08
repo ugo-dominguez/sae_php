@@ -1,8 +1,6 @@
 <?php
-namespace App\Models;
 
-use App\Config\Database;
-use PDO;
+namespace App\Models;
 
 class User {
     public int $id;
