@@ -31,6 +31,7 @@
                     <img src="/assets/images/baratie.jpg" alt="<?= htmlspecialchars($restaurant->name) ?>">
                     <h3><?= htmlspecialchars($restaurant->name) ?></h3>
                     <p><?= htmlspecialchars($restaurant->getAddress()) ?></p>
+                    <p><?= htmlspecialchars($restaurant->getStars()) ?> (<?= $restaurant->getReviewCount() ?> avis)</p>
                     
                     <?php if (isset($restaurant->schedule)): ?>
                         <?php if ($restaurant->isCurrentlyOpen()): ?>

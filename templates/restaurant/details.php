@@ -10,6 +10,11 @@
                 <span class="material-symbols-rounded">location_on</span> 
                 <?= htmlspecialchars($restaurant->getAddress()) ?>
             </p>
+
+            <p class="details-note">
+                <span class="material-symbols-rounded">star</span> 
+                <?= $restaurant->getNote() ?> (<?= $restaurant->getReviewCount() ?> avis)
+            </p>
             
             <?php if (isset($restaurant->schedule)): ?>
                 <div class="hours-info">
@@ -61,8 +66,21 @@
 
     <hr class="divider">
 
+    <h2>Avis</h2>
     <div class="reviews">
-        <h2>Avis</h2>
-        
+        <?php foreach ($reviews as $review): ?>
+                <div class="review">
+                    <div class="review-header">
+                    <img src="/assets/images/user.png" alt="User icon" class="small-pfp">
+                        <a href="/profile/<?= $review->idUser ?>"><?= $review->author->username ?></a>
+                    </div>
+                    <div class="review-content">
+                        <p><?= $review->comment ?></p>
+                        <p><?= $review->getStars() ?></p>
+                    </div>
+                </div>
+
+                <p class="separator">--------------------------------------------------------------------------------------------------</p>
+            <?php endforeach; ?>
     </div>
 </main>

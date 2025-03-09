@@ -297,7 +297,7 @@ body {
     margin-top: 10px;
 }
 
-.address, .website, .phone {
+.address, .website, .phone, .details-note {
     display: flex;
     align-items: center;
     gap: 5px;
@@ -327,6 +327,12 @@ body {
     .restaurant-info {
         padding-top: 0;
     }
+}
+
+.small-pfp {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
 }
 
 /* Animations */
@@ -388,10 +394,8 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-  }
-  
-  
-
+    margin-top: 20px;
+}
 
 .review {
     width: 40vw;
@@ -401,6 +405,7 @@ body {
 .review-header {
     display: flex;
     gap: 20px;
+    margin-bottom: 10px;
 }
 
 .review-header a {
