@@ -9,7 +9,9 @@ class RestaurantController extends BaseController {
         $pageTitle = 'Détails du restaurant';
 
         Requests::getConnection();
+        
         $restaurant = Requests::getRestaurantById((int) $id);
+        $reviews = Requests::getReviewsForRestaurant((int) $id);
 
         if (!$restaurant) {
             http_response_code(404);
@@ -19,7 +21,8 @@ class RestaurantController extends BaseController {
 
         $this->render('restaurant/details', [
             'pageTitle' => $pageTitle,
-            'restaurant' => $restaurant
+            'restaurant' => $restaurant,
+            'reviews' => $reviews,
         ]);
     }
 }

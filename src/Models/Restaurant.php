@@ -2,6 +2,7 @@
 namespace App\Models;
 
 use App\Config\Requests;
+use App\Config\Utils;
 
 class Restaurant {
     public int $id;
@@ -125,5 +126,27 @@ class Restaurant {
             }
         }
         return $mappedSchedule;
+    }
+
+    public function getNote() {
+        $reviews = Requests::getReviewsForRestaurant($this->id);
+        if (count($reviews) === 0) {
+            return 0;
+        }
+        
+        $total = 0;
+        foreach ($reviews as $review) {
+            $total += $review->note;
+        }
+
+        return $total / count($reviews);
+    }
+
+    public function getStars() {
+        return Utils::getStars($this->getNote());
+    }
+
+    public function getReviewCount() {
+        return count(Requests::getReviewsForRestaurant($this->id));
     }
 }

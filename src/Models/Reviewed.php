@@ -2,6 +2,7 @@
 namespace App\Models;
 
 use App\Config\Requests;
+use App\Config\Utils;
 
 class Reviewed {
     public $idUser;
@@ -15,23 +16,12 @@ class Reviewed {
         $this->idRestau = $data['idRestau'];
         $this->note = $data['note'];
         $this->comment = $data['comment'] ?? '';
+
         $this->restaurant = Requests::getRestaurantById($data['idRestau']);
+        $this->author = Requests::getUserById($data['idUser']);
     }
     
     public function getStars() : string {
-        $res = '';
-        for ($i = 0; $i < $this->note; $i++) {
-            $res .= '★';
-        }
-
-        if ($this->note - (int) $this->note >= 0.5) {
-            $res .= '⯪';
-        }
-
-        for ($i = mb_strlen($res); $i < 5; $i++) {
-            $res .= '☆';
-        }
-
-        return $res;
+        return Utils::getStars($this->note);
     }
 }

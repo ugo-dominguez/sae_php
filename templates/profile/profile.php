@@ -13,7 +13,7 @@
         <?php foreach ($reviews as $review): ?>
                 <div class="review">
                     <div class="review-header">
-                        <a href=""><?= $review->restaurant->name ?></a>
+                        <a href="/restaurant/<?= $review->restaurant->id ?>"><?= $review->restaurant->name ?></a>
                         <div class="location">
                             <span class="material-symbols-rounded">location_on</span>
                             <p><?= $review->restaurant->getAddress() ?></p>
