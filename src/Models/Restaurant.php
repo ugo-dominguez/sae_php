@@ -44,11 +44,20 @@ class Restaurant {
 
     public function isCurrentlyOpen() {
         ['day' => $currentDay, 'time' => $currentTime] = $this->getCurrentDayTime();
-    
+        
         if (isset($this->schedule[$currentDay])) {
             foreach ($this->schedule[$currentDay] as $timeRange) {
                 list($openTime, $closeTime) = explode('-', $timeRange);
-                if ($currentTime >= $openTime && $currentTime <= $closeTime) {
+                
+                $currentTimestamp = strtotime($currentTime);
+                $openTimestamp = strtotime($openTime);
+                $closeTimestamp = strtotime($closeTime);
+                
+                if ($closeTimestamp < $openTimestamp) {
+                    $closeTimestamp = strtotime('+1 day', $closeTimestamp);
+                }
+                
+                if ($currentTimestamp >= $openTimestamp && $currentTimestamp <= $closeTimestamp) {
                     return true;
                 }
             }
