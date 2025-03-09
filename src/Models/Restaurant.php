@@ -87,7 +87,7 @@ class Restaurant {
         $nextDay = self::$days[($currentIndex + 1) % 7];
     
         if (isset($this->schedule[$nextDay])) {
-            return $this->schedule[$nextDay][0] ? explode('-', $this->schedule[$nextDay][0])[0] : null;
+            return $this->schedule[$nextDay][0] ? explode('-', $this->schedule[$nextDay][0])[0] : '';
         }
         return 'N/A'; 
     }
