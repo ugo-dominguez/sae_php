@@ -61,6 +61,19 @@ class Database {
         }
     }
 
+    public static function insertUser(string $username, string $hashedPassword) {
+        try {
+            $userData[] = [
+                'username' => $username,
+                'password' => $hashedPassword
+            ];
+            self::insertInto('User', $userData);
+        } catch (PDOException $e) {
+            self::$connection->rollBack();
+            throw new \Exception("Erreur lors de l'insertion d'un nouvel utilisateur: " . $e->getMessage());
+        }
+    }
+
     private static function prepareFoodTypeData(): array {
         $foodTypes = [];
         foreach (self::$data as $restaurant) {

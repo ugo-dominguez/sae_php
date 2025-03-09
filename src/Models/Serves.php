@@ -1,27 +1,12 @@
 <?php
+namespace App\Models;
 
 class Serves {
-    private $idRestau;
-    private $type;
+    public int $idRestau;
+    public string $type;
     
-    public function __construct($idRestau = null, $type = null) {
-        $this->idRestau = $idRestau;
-        $this->type = $type;
-    }
-    
-    public function getIdRestau() {
-        return $this->idRestau;
-    }
-    
-    public function setIdRestau($idRestau) {
-        $this->idRestau = $idRestau;
-    }
-    
-    public function getType() {
-        return $this->type;
-    }
-    
-    public function setType($type) {
-        $this->type = $type;
+    public function __construct(array $data) {
+        $this->idRestau = $data['idRestau'];
+        $this->type = $data['type'];
     }
 }

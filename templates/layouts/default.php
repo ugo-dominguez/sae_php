@@ -6,11 +6,17 @@
     <title><?= htmlspecialchars($pageTitle ?? 'Baratie') ?></title>
     <link rel="stylesheet" href="/assets/css/style.css">
     <link rel="stylesheet" href="/assets/css/register.css">
+    <link rel="stylesheet" href="/assets/css/login.css">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" rel="stylesheet"/>
 </head>
 <body>
     <?php require ROOT_DIR . '/templates/partials/header.php'; ?>
-    <?php require ROOT_DIR . "/templates/$template.php"; ?>
+
+
+    <div class="content-container">
+        <?php require ROOT_DIR . "/templates/$template.php"; ?>
+    </div>
+
     <script src="/assets/js/script.js"></script>
 </body>
 </html>

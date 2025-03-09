@@ -47,7 +47,6 @@ class Reviewed {
     
     public function setComment($comment) {
         $this->comment = $comment;
-    }
 
     public function getRestaurant() {
         return $this->restaurant;

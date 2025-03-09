@@ -19,15 +19,15 @@ class Requests {
         return self::$connection;
     }
 
-    public static function makeRestaurants($statement): array {
+    public static function makeEntities($statement, string $className): array {
         try {
-            $restaurants = [];
+            $entities = [];
             while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-                $restaurants[] = new Restaurant($row);
+                $entities[] = new $className($row);
             }
-            return $restaurants;
+            return $entities;
         } catch (PDOException $e) {
-            error_log("Erreur lors de la récupération des restaurants: " . $e->getMessage());
+            error_log("Erreur lors de la récupération des entités: " . $e->getMessage());
             return [];
         }
     }
@@ -39,7 +39,7 @@ class Requests {
             $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
             $stmt->execute();
             
-            return self::makeRestaurants($stmt);
+            return self::makeEntities($stmt, '\App\Models\Restaurant');
         } catch (PDOException $e) {
             error_log("Erreur lors de la récupération des restaurants: " . $e->getMessage());
             return [];
@@ -52,9 +52,22 @@ class Requests {
             $stmt = self::$connection->prepare($query);
             $stmt->execute([$id]);
 
-            return self::makeRestaurants($stmt)[0];
+            return self::makeEntities($stmt, '\App\Models\Restaurant')[0];
         } catch (PDOException $e) {
             error_log("Erreur lors de la récupération d'un restaurant: " . $e->getMessage());
+            return null;
+        }
+    }
+
+    public static function getUserByUsername(string $username) { 
+        try {
+            $query = "SELECT * FROM User WHERE username = ?";  
+            $stmt = self::$connection->prepare($query);
+            $stmt->execute([$username]);
+        
+            return self::makeEntities($stmt, '\App\Models\User')[0];
+        } catch (PDOException $e) {
+            error_log("Erreur lors de la récupération d'un utilisateur: " . $e->getMessage());
             return null;
         }
     }
@@ -85,7 +98,7 @@ class Requests {
             }
             $stmt->execute($params);
         
-            return self::makeRestaurants($stmt);
+            return self::makeEntities($stmt, '\App\Models\Restaurant');
         } catch (PDOException $e) {
             error_log("Erreur lors de la récupération des restaurants: " . $e->getMessage());
             return [];
