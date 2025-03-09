@@ -9,6 +9,7 @@ use App\Config\Router;
 use App\Config\Requests;
 use App\Controllers\HomeController;
 use App\Controllers\AuthController;
+use App\Controllers\ProfileController;
 use App\Controllers\SearchController;
 use App\Controllers\RestaurantController;
 
@@ -29,12 +30,16 @@ try {
     $router->get('/restaurant/{id}', function ($id) {
         (new RestaurantController())->show($id);
     });
+
+    $router->get('/profile/{id}', function ($id) {
+        (new ProfileController())->show($id);
+    });
+    
     $router->get('/register', [new AuthController(), 'registerForm']);
     $router->post('/register', [new AuthController(), 'registerSubmit']);
     $router->get('/login', [new AuthController(), 'showLoginForm']);
     $router->post('/login', [new AuthController(), 'login']);
     $router->get('/logout', [new AuthController(), 'logout']);
-    $router->get('/profile', [new AuthController(), 'profile']);
   
     $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
     $router->dispatch($path);

@@ -5,6 +5,9 @@ namespace App\Config;
 use PDO;
 use PDOException;
 use App\Config\Database;
+use App\Models\Restaurant;
+use App\Models\User;
+use App\Models\Reviewed;
 
 class Requests {
     private static ?PDO $connection = null;
@@ -111,6 +114,47 @@ class Requests {
             return $stmt->fetchAll(PDO::FETCH_COLUMN);
         } catch (PDOException $e) {
             error_log("Erreur lors de la récupération des restaurants: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    public static function getUserById(int $id) : User {
+        try {
+            $query = "SELECT * FROM User WHERE idUser = ?";
+            $stmt = self::$connection->prepare($query);
+            $stmt->execute([$id]);
+            
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            return new User($row);
+
+        } catch (PDOException $e) {
+            error_log("Erreur lors de la récupération d'un utilisateur: " . $e->getMessage());
+            return null;
+        }
+    }
+
+    public static function getReviewsOfUser(int $userId) : array {
+        try {
+            $query = "SELECT * FROM Reviewed WHERE idUser = ?";
+            $stmt = self::$connection->prepare($query);
+            $stmt->execute([$userId]);
+            
+            return self::makeEntities($stmt, '\App\Models\Reviewed');
+        } catch (PDOException $e) {
+            error_log("Erreur lors de la récupération des avis: " . $e->getMessage());
+            return [];
+        }
+    }
+    
+    public static function getReviewsForRestaurant(int $restaurantId) : array {
+        try {
+            $query = "SELECT * FROM Reviewed WHERE idRestau = ?";
+            $stmt = self::$connection->prepare($query);
+            $stmt->execute([$restaurantId]);
+            
+            return self::makeEntities($stmt, '\App\Models\Reviewed');
+        } catch (PDOException $e) {
+            error_log("Erreur lors de la récupération des avis: " . $e->getMessage());
             return [];
         }
     }
