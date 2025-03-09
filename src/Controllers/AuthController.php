@@ -65,7 +65,7 @@ class AuthController extends BaseController {
     }
     
     public function login(): void {
-        $username = strtolower(trim($_POST['username'] ?? ''));
+        $username = trim($_POST['username'] ?? '');
         $password = $_POST['password'] ?? '';
     
         error_log("Tentative de connexion pour username: '{$username}'");

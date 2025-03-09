@@ -139,7 +139,7 @@ class Restaurant {
             $total += $review->note;
         }
 
-        return $total / count($reviews);
+        return round($total / count($reviews), 2);
     }
 
     public function getStars() {
