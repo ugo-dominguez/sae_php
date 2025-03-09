@@ -12,12 +12,6 @@ class ProfileController extends BaseController {
         $user = Requests::getUserById((int) $id);
 
         $reviews = Requests::getReviewsOfUser((int) $id);
-        foreach ($reviews as $review) {
-            $restaurant = Requests::getRestaurantById($review->getIdRestau());
-            if ($restaurant) {
-                $review->setRestaurant($restaurant);
-            }
-        }
 
         if (!$user) {
             http_response_code(404);

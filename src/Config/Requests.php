@@ -125,7 +125,7 @@ class Requests {
             $stmt->execute([$id]);
             
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
-            return new User($row['idUser'], $row['username'], $row['password']);
+            return new User($row);
 
         } catch (PDOException $e) {
             error_log("Erreur lors de la récupération d'un utilisateur: " . $e->getMessage());
@@ -139,28 +139,20 @@ class Requests {
             $stmt = self::$connection->prepare($query);
             $stmt->execute([$userId]);
             
-            $reviews = [];
-            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                $reviews[] = new Reviewed($row['idUser'], $row['idRestau'], $row['note'], $row['comment']);
-            }
-            return $reviews;
+            return self::makeEntities($stmt, '\App\Models\Reviewed');
         } catch (PDOException $e) {
             error_log("Erreur lors de la récupération des avis: " . $e->getMessage());
             return [];
         }
     }
-
+    
     public static function getReviewsForRestaurant(int $restaurantId) : array {
         try {
             $query = "SELECT * FROM Reviewed WHERE idRestau = ?";
             $stmt = self::$connection->prepare($query);
             $stmt->execute([$restaurantId]);
             
-            $reviews = [];
-            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                $reviews[] = new Reviewed($row['idUser'], $row['idRestau'], $row['note'], $row['comment']);
-            }
-            return $reviews;
+            return self::makeEntities($stmt, '\App\Models\Reviewed');
         } catch (PDOException $e) {
             error_log("Erreur lors de la récupération des avis: " . $e->getMessage());
             return [];

@@ -2,7 +2,7 @@
     <div class="profile">
         <img src="/assets/images/user.png" alt="User icon" class="main-image">
         <div>
-            <h1><?= $user->getUsername() ?></h1>
+            <h1><?= $user->username ?></h1>
         </div>
     </div>
 
@@ -13,20 +13,20 @@
         <?php foreach ($reviews as $review): ?>
                 <div class="review">
                     <div class="review-header">
-                        <a href=""><?= $review->getRestaurant()->name ?></a>
+                        <a href=""><?= $review->restaurant->name ?></a>
                         <div class="location">
                             <span class="material-symbols-rounded">location_on</span>
-                            <p><?= $review->getRestaurant()->getAddress() ?></p>
+                            <p><?= $review->restaurant->getAddress() ?></p>
                         </div>
                     </div>
                     <div class="review-content">
-                        <p><?= $review->getComment() ?></p>
+                        <p><?= $review->comment ?></p>
                         <p><?= $review->getStars() ?></p>
                     </div>
                 </div>
 
                 <p class="separator">--------------------------------------------------------------------------------------------------</p>
-                <?php endforeach; ?>
-            </div>
+            <?php endforeach; ?>
+        </div>
     </div>
 </main>
