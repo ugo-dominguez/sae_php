@@ -4,8 +4,7 @@ namespace Tests\Unit\Controllers;
 use PHPUnit\Framework\TestCase;
 use App\Controllers\HomeController;
 
-class HomeControllerTest extends TestCase
-{
+class HomeControllerTest extends TestCase {
     private $homeController;
     
     protected function setUp(): void {
@@ -58,7 +57,6 @@ class HomeControllerTest extends TestCase
         
         $this->homeController->home();
     }
-    
     
     protected function tearDown(): void {
         $this->homeController = null;

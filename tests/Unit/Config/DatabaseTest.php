@@ -4,8 +4,7 @@ namespace Tests\Unit\Config;
 use PHPUnit\Framework\TestCase;
 use App\Config\Database;
 
-class DatabaseTest extends TestCase
-{
+class DatabaseTest extends TestCase {
     private static $testDbPath;
     
     protected function setUp(): void {
