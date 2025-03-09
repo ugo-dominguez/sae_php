@@ -435,3 +435,90 @@ body {
     width: 35vw;
     height: 20px;
 }
+
+/* Style du review form */
+.review-form-container {
+    margin-bottom: 30px;
+}
+
+.review-form-container h3 {
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+.review-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.star-rating {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+    margin-bottom: 15px;
+}
+
+.star-rating input {
+    display: none;
+}
+
+.star-rating label {
+    font-size: 24px;
+    color: #ccc;
+    cursor: pointer;
+    padding: 0 2px;
+}
+
+.star-rating label:hover,
+.star-rating label:hover ~ label,
+.star-rating input:checked ~ label {
+    color: #000;
+}
+
+.review-form textarea {
+    border: 2px solid #000;
+    border-radius: 12px;
+    padding: 10px;
+    min-height: 80px;
+    margin-bottom: 10px;
+    resize: vertical;
+}
+
+.submit-button {
+    align-self: flex-end;
+    background-color: #000;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 20px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.submit-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+}
+
+.submit-button:active {
+    transform: scale(0.98);
+}
+
+.alert {
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+}
+
+.alert-danger {
+    background-color: #ffeeee;
+    border: 1px solid #ffcccc;
+    color: #cc0000;
+}
+
+.alert-success {
+    background-color: #eeffee;
+    border: 1px solid #ccffcc;
+    color: #00cc00;
+}

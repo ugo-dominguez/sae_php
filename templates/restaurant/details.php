@@ -65,22 +65,55 @@
     </div>
 
     <hr class="divider">
+    
+    <?php if (isset($_SESSION['user_id'])): ?>
+        <div class="review-form-container">
+            <h3>Laisser un avis</h3>
+
+            <?php if (isset($error)): ?>
+                <div class="alert alert-danger"><?= $error ?></div>
+            <?php endif; ?>
+            
+            <?php if (isset($success)): ?>
+                <div class="alert alert-success"><?= $success ?></div>
+            <?php endif; ?>
+
+            <form action="/restaurant/<?= htmlspecialchars($restaurant->id) ?>" method="POST" class="review-form">
+                <div class="star-rating">
+                    <input type="radio" id="star5" name="rating" value="5" />
+                    <label for="star5">★</label>
+                    <input type="radio" id="star4" name="rating" value="4" />
+                    <label for="star4">★</label>
+                    <input type="radio" id="star3" name="rating" value="3" />
+                    <label for="star3">★</label>
+                    <input type="radio" id="star2" name="rating" value="2" />
+                    <label for="star2">★</label>
+                    <input type="radio" id="star1" name="rating" value="1" />
+                    <label for="star1">★</label>
+                </div>
+                <textarea name="comment" placeholder="Partagez votre avis ..."></textarea>
+                <button type="submit" class="submit-button">Publier</button>
+            </form>
+        </div>
+    <?php else: ?>
+        <p>Veuillez vous <a href="/auth/login">connecter</a> pour laisser un avis.</p>
+    <?php endif; ?>
 
     <h2>Avis</h2>
     <div class="reviews">
         <?php foreach ($reviews as $review): ?>
-                <div class="review">
-                    <div class="review-header">
-                    <img src="/assets/images/user.png" alt="User icon" class="small-pfp">
-                        <a href="/profile/<?= $review->idUser ?>"><?= $review->author->username ?></a>
-                    </div>
-                    <div class="review-content">
-                        <p><?= $review->comment ?></p>
-                        <p><?= $review->getStars() ?></p>
-                    </div>
+            <div class="review">
+                <div class="review-header">
+                <img src="/assets/images/user.png" alt="User icon" class="small-pfp">
+                    <a href="/profile/<?= $review->idUser ?>"><?= $review->author->username ?></a>
                 </div>
+                <div class="review-content">
+                    <p><?= $review->comment ?></p>
+                    <p><?= $review->getStars() ?></p>
+                </div>
+            </div>
 
-                <p class="separator">--------------------------------------------------------------------------------------------------</p>
-            <?php endforeach; ?>
+            <p class="separator">--------------------------------------------------------------------------------------------------</p>
+        <?php endforeach; ?>
     </div>
 </main>

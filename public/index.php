@@ -30,6 +30,9 @@ try {
     $router->get('/restaurant/{id}', function ($id) {
         (new RestaurantController())->show($id);
     });
+    $router->post('/restaurant/{id}', function ($id) {
+        (new RestaurantController())->submitReview($id);
+    });
 
     $router->get('/profile/{id}', function ($id) {
         (new ProfileController())->show($id);

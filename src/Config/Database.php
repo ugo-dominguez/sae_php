@@ -74,6 +74,21 @@ class Database {
         }
     }
 
+    public static function insertReview(int $userId, int $restaurantId, int $rating, string $comment) {
+        try {
+            $reviewData[] = [
+                'idUser' => $userId,
+                'idRestau' => $restaurantId,
+                'note' => $rating,
+                'comment' => $comment
+            ];
+            self::insertInto('Reviewed', $reviewData);
+        } catch (PDOException $e) {
+            self::$connection->rollBack();
+            throw new \Exception("Erreur lors de l'insertion d'un nouvel avis: " . $e->getMessage());
+        }
+    }
+
     private static function prepareFoodTypeData(): array {
         $foodTypes = [];
         foreach (self::$data as $restaurant) {

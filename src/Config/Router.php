@@ -25,7 +25,7 @@ class Router {
         foreach ($this->routes[$method] as $route => $callback) {
             $pattern = preg_replace('/\{([^\/]+)\}/', '([^/]+)', $route);
             if (preg_match("#^$pattern$#", $path, $matches)) {
-                array_shift($matches); // Remove full match
+                array_shift($matches);
                 call_user_func_array($callback, $matches);
                 return;
             }
