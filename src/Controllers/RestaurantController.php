@@ -47,7 +47,7 @@ class RestaurantController extends BaseController {
             exit;
         }
         
-        if (!empty(Requests::getReviewsOfUser($_SESSION['user_id']))) {
+        if (!empty(Requests::getReviewsOfUserForRestaurant($_SESSION['user_id'], (int) $id))) {
             $_SESSION['error'] = "Vous avez déjà laissé un avis sur ce restaurant.";
             header("Location: /restaurant/{$id}");
             exit;

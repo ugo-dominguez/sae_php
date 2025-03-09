@@ -158,4 +158,17 @@ class Requests {
             return [];
         }
     }
+
+    public static function getReviewsOfUserForRestaurant(int $userId, int $restaurantId) : array {
+        try {
+            $query = "SELECT * FROM Reviewed WHERE idUser = ? AND idRestau = ?";
+            $stmt = self::$connection->prepare($query);
+            $stmt->execute([$userId, $restaurantId]);
+
+            return self::makeEntities($stmt, '\App\Models\Reviewed');
+        } catch (PDOException $e) {
+            error_log("Erreur lors de la récupération des avis: " . $e->getMessage());
+            return [];
+        }
+    }
 }

@@ -96,7 +96,7 @@
             </form>
         </div>
     <?php else: ?>
-        <p class="login-prompt">Veuillez vous <a href="/auth/login" class="login-link">connecter</a> pour laisser un avis.</p>
+        <p class="login-prompt">Veuillez vous <a href="/login" class="login-link">connecter</a> pour laisser un avis.</p>
     <?php endif; ?>
 
     <h2>Avis</h2>
