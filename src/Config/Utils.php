@@ -5,18 +5,19 @@ namespace App\Config;
 class Utils {
     public static function getStars(float $note) : string {
         $res = '';
-        for ($i = 0; $i < $note; $i++) {
-            $res .= '★';
-        }
+        
+        $fullStars = (int) $note;
+        $halfStar = ($note - $fullStars) >= 0.5 ? 1 : 0;
+        $emptyStars = 5 - ($fullStars + $halfStar);
 
-        if ($note - (int) $note >= 0.5) {
+        $res .= str_repeat('★', $fullStars);
+        
+        if ($halfStar) {
             $res .= '⯪';
         }
-
-        for ($i = mb_strlen($res); $i < 5; $i++) {
-            $res .= '☆';
-        }
-
+        
+        $res .= str_repeat('☆', $emptyStars);
+        
         return $res;
     }
 }
