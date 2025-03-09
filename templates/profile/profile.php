@@ -10,22 +10,23 @@
         <h2>Avis récents : </h2>
 
         <div class="reviews">
-            <div class="review">
-                <div class="review-header">
-                    <a href="">Crêperie bretonne</a>
-                    <div class="location">
-                        <span class="material-symbols-rounded">location_on</span>
-                        <p>244 Rue de Bourgogne, 45000 Orléans  </p>
+        <?php foreach ($reviews as $review): ?>
+                <div class="review">
+                    <div class="review-header">
+                        <a href=""><?= $review->getRestaurant()->name ?></a>
+                        <div class="location">
+                            <span class="material-symbols-rounded">location_on</span>
+                            <p><?= $review->getRestaurant()->getAddress() ?></p>
+                        </div>
+                    </div>
+                    <div class="review-content">
+                        <p><?= $review->getComment() ?></p>
+                        <p><?= $review->getStars() ?></p>
                     </div>
                 </div>
-                <div class="review-content">
-                    <p>Super restaurant ^^</p>
-                    <p>★★★★★</p>
-                </div>
+
+                <p class="separator">--------------------------------------------------------------------------------------------------</p>
+                <?php endforeach; ?>
             </div>
-
-            <p class="separator">--------------------------------------------------------------------------------------------------</p>
-        </div>
-
     </div>
 </main>

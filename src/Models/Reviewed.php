@@ -1,4 +1,7 @@
 <?php
+namespace App\Models;
+
+use App\Config\Requests;
 
 class Reviewed {
     private $idUser;
@@ -11,6 +14,7 @@ class Reviewed {
         $this->idRestau = $idRestau;
         $this->note = $note;
         $this->comment = $comment;
+        $this->restaurant = Requests::getRestaurantById($idRestau);
     }
     
     public function getIdUser() {
@@ -43,5 +47,30 @@ class Reviewed {
     
     public function setComment($comment) {
         $this->comment = $comment;
+    }
+
+    public function getRestaurant() {
+        return $this->restaurant;
+    }
+    
+    public function setRestaurant($restaurant) {
+        $this->restaurant = $restaurant;
+    }
+
+    public function getStars() : string {
+        $res = '';
+        for ($i = 0; $i < $this->note; $i++) {
+            $res .= '★';
+        }
+
+        if ($this->note - (int) $this->note >= 0.5) {
+            $res .= '⯪';
+        }
+
+        for ($i = mb_strlen($res); $i < 5; $i++) {
+            $res .= '☆';
+        }
+
+        return $res;
     }
 }

@@ -11,6 +11,14 @@ class ProfileController extends BaseController {
         Requests::getConnection();
         $user = Requests::getUserById((int) $id);
 
+        $reviews = Requests::getReviewsOfUser((int) $id);
+        foreach ($reviews as $review) {
+            $restaurant = Requests::getRestaurantById($review->getIdRestau());
+            if ($restaurant) {
+                $review->setRestaurant($restaurant);
+            }
+        }
+
         if (!$user) {
             http_response_code(404);
             echo "User not found";
@@ -19,7 +27,8 @@ class ProfileController extends BaseController {
 
         $this->render('profile/profile', [
             'pageTitle' => $pageTitle,
-            'user' => $user
+            'reviews' => $reviews,
+            'user' => $user,
         ]);
     }
 }
