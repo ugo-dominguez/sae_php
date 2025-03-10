@@ -32,9 +32,15 @@ class Requests {
         }
     }
     
-    public static function getRestaurants(int $limit): array {
+    public static function getRestaurantsWithBestRatings(int $limit): array {
         try {
-            $query = "SELECT * FROM Restaurant LIMIT :limit";
+            $query = "SELECT Restaurant.*, AVG(Reviewed.note) as average_rating
+                FROM Restaurant
+                LEFT JOIN Reviewed ON Restaurant.idRestau = Reviewed.idRestau
+                GROUP BY Restaurant.idRestau
+                ORDER BY average_rating DESC
+                LIMIT :limit";
+            
             $stmt = self::$connection->prepare($query);
             $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
             $stmt->execute();

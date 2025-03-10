@@ -8,7 +8,7 @@ class HomeController extends BaseController {
         $pageTitle = 'Baratie';
 
         Requests::getConnection();
-        $restaurants = Requests::getRestaurants(5);
+        $restaurants = Requests::getRestaurantsWithBestRatings(5);
         $restaurantTypes = Requests::getAllRestaurantTypes();
 
         $this->render('home/homepage', [
